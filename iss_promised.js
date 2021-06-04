@@ -13,15 +13,23 @@ const fetchFlyOverTimes = function(body) {
   return request(`http://api.open-notify.org/iss/v1/?lat=${coords.latitude}&lon=${coords.longitude}`);
 };
 
-const nextISSTimesForMyLocation = function(body) {
-  let result = JSON.parse(body).response;
-  return result;
-}
-
 const print = function(obj) {
   for (let item of obj) {
-    console.log(`Next pass at risetime ${item.risetime} for ${item.duration} seconds!`)
+    const datetime = new Date(0);
+    datetime.setUTCSeconds(item.risetime);
+    console.log(`Next pass at risetime ${datetime} for ${item.duration} seconds!`);
   }
-}
+};
+
+const nextISSTimesForMyLocation = function() {
+  return fetchMyIP()
+    .then(fetchCoordsByIP)
+    .then(fetchFlyOverTimes) //return flyovertimes
+    .then((body) => {
+      let result = JSON.parse(body).response;
+      return result;
+    });
+};
+
 
 module.exports = { fetchMyIP, fetchCoordsByIP, fetchFlyOverTimes, nextISSTimesForMyLocation, print };
